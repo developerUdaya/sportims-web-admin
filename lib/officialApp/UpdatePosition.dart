@@ -439,7 +439,7 @@ class _UpdatePositionState extends State<UpdatePosition> {
       print(participant.skaterId);
 
       results.add(resultModel);
-      db.child('skaters/${participant.skaterId}/events/${eventModel!.id}/result/categoryResultModel/${(scheduleModel!.raceCategory).replaceAll('-', "").replaceAll('/', "").replaceAll(" ", "")}/').set(categoryResultModel.toJson());
+      // db.child('skaters/${participant.}/events/${eventModel!.id}/result/categoryResultModel/${(scheduleModel!.raceCategory).replaceAll('-', "").replaceAll('/', "").replaceAll(" ", "")}/').set(categoryResultModel.toJson());
 
       print(results[0].categoryResultModel[0].H1);
 

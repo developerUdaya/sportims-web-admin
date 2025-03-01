@@ -475,25 +475,26 @@ class EventParticipantsDataSource extends DataTableSource {
         DataCell(IconButton(
           icon: Icon(Icons.file_present, size: 16, color: Colors.red),
           onPressed: () {
+            downloadCertificates(data.first.id);
             // showEditDialog(eventSchedule);
-            if(published){
-              showDialog(
-                  context: context,
-                  builder: (context) {
-                    return AlertDialog(
-                      title: Text('Error'),
-                      content: Text('Results are not published'),
-                      actions: [TextButton(
-                          onPressed: (){
-                            Navigator.pop(context);
-                          },
-                          child: Text('Ok'))],
-                    );
-                  },
-              );
-            }else{
-              fetchAndDownloadAllCertificates(report.id);
-            }
+            // if(published){
+            //   showDialog(
+            //       context: context,
+            //       builder: (context) {
+            //         return AlertDialog(
+            //           title: Text('Error'),
+            //           content: Text('Results are not published'),
+            //           actions: [TextButton(
+            //               onPressed: (){
+            //                 Navigator.pop(context);
+            //               },
+            //               child: Text('Ok'))],
+            //         );
+            //       },
+            //   );
+            // }else{
+            //   fetchAndDownloadAllCertificates(report.id);
+            // }
           },
         )),
       ],
@@ -607,4 +608,27 @@ class EventParticipantsDataSource extends DataTableSource {
     return combinedPdfBytes.toBytes();
   }
 
+
+static Future<void> downloadCertificates(String eventId) async {
+    final String apiUrl = "http://103.174.10.153:8000/download_certificates/$eventId";
+    final String fileName = "${eventId}_certificates.zip";
+
+    try {
+      var response = await http.get(Uri.parse(apiUrl));
+      if (response.statusCode == 200) {
+        final blob = html.Blob([response.bodyBytes]);
+        final url = html.Url.createObjectUrlFromBlob(blob);
+        
+        final anchor = html.AnchorElement(href: url)
+          ..setAttribute("download", fileName)
+          ..click();
+        
+        html.Url.revokeObjectUrl(url);
+      } else {
+        print("Failed to download file. Server error.");
+      }
+    } catch (e) {
+      print("Error downloading file: $e");
+    }
+  }
 }

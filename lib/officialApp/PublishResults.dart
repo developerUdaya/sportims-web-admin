@@ -32,13 +32,11 @@ class _PublishDataPageState extends State<PublishDataPage> {
   List<EventScheduleModel> tableData = [];
   List<ResultModel> results = [];
   List<Users> allSkaters =[];
-  bool enablePublish = false;
   final database = FirebaseDatabase.instance;
   @override
   void initState() {
     super.initState();
     getEventScheduleModel(widget.eventModel!.id);
-    getPublishValue();
     getUsers();
 
 
@@ -72,12 +70,7 @@ class _PublishDataPageState extends State<PublishDataPage> {
     });
   }
 
-  Future<void> getPublishValue() async {
-    DataSnapshot publishRef = await database.ref().child('events/pastEvents/${widget.eventModel!.id}/published/').get();
-    setState(() {
-      enablePublish = publishRef.exists? publishRef.value as String != 'Published':true;
-    });
-  }
+
 
   Future<void> getEventScheduleModel(String eventId) async {
     List<EventScheduleModel> eventSchedules = [];
@@ -117,84 +110,6 @@ class _PublishDataPageState extends State<PublishDataPage> {
     }
   }
   
-  Future<void> checkForCertificateStatus() async {
-    final ref = database.ref().child('events/pastEvents/${widget.eventModel!.id}/certificateStatus');
-    final eventScheduleRef = database.ref().child('events/pastEvents/${widget.eventModel!.id}/eventSchedules');
-    final certStatusSnapShot = await ref.get();
-    if(certStatusSnapShot.exists){
-      bool certificateStatus = certStatusSnapShot.value as bool;
-      if(certificateStatus){
-        publishAllParticipants();
-      }else{
-        bool? confirmation = await showDialog<bool>(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text('Certificate Generation Diabled'),
-              content: Text('Are you sure you want to publish all participants without certificates? This action cannot be undone.'),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop(false);
-                  },
-                  child: Text('Cancel'),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop(true);
-                  },
-                  child: Text('Publish'),
-                ),
-              ],
-            );
-          },
-        );
-
-        if (confirmation == true) {
-
-          showDialog(
-              context: context,
-              barrierDismissible: false,
-              builder: (context) => Center(child: CircularProgressIndicator(color: Colors.blue,),)
-          );
-          try {
-            for (var result in results) {
-              // Fetch and update result for each event schedule
-              for (var categoryResultModel in result.categoryResultModel) {
-                String? resultId = findResultId(
-                    result.skaterId, categoryResultModel.eventScheduleId);
-                await eventScheduleRef.child(
-                    '${categoryResultModel
-                        .eventScheduleId}/resultList/$resultId')
-                    .update({'published': 'Published'});
-              }
-            }
-
-            final publishRef = database.ref().child('events/pastEvents/${widget.eventModel!.id}/published/');
-            publishRef.set('Published');
-
-            setState(() {
-              enablePublish = false;
-            });
-            Navigator.of(context, rootNavigator: true).pop(); // Close only the dialog
-
-
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('All participants published successfully')));
-
-            showSuccessDialog('All participants published successfully');
-            // Ensure only the dialog is clos
-          }catch(e){
-            Navigator.of(context, rootNavigator: true).pop(); // Close only the dialog
-
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error Occurred')));
-            return;
-          }
-
-          }
-      }
-    }
-  }
-
   Future<void> publishAllParticipants() async {
     bool? confirmation = await showDialog<bool>(
       context: context,
@@ -221,189 +136,51 @@ class _PublishDataPageState extends State<PublishDataPage> {
     );
 
     if (confirmation == true) {
-      final ref = database.ref().child('events/pastEvents/${widget.eventModel!.id}/eventSchedules');
-      final DatabaseReference certref = database.ref().child("events/pastEvents/${widget.eventModel?.id}/certificateDetails/");
-      final DataSnapshot snapshot = await certref.get();
-      final Map<String, dynamic> snapshotValue = Map<String, dynamic>.from(snapshot.value as Map);
 
-      final String imageUrl = snapshotValue['imageUrl'];
-      final List<Map<String, dynamic>> textFields = List<Map<String, dynamic>>.from(
-        (snapshotValue['textFields'] as List).map((e) => Map<String, dynamic>.from(e as Map)),
-      );
+      const String apiUrl = "http://103.174.10.153:8000/generate_certificates";
+  
+      try {
+        Map<String, dynamic> jsonResults = {
+  "users_data": results.map((e) => {
+    "name": e.skaterName,
+    "eventId": e.eventId,
+    "skaterId": e.skaterId,
+    "club": allSkaters.firstWhere((element) => element.skaterID == e.skaterId).club,
+    "dateOfBirth": e.ageCategory,
+    "district": allSkaters.firstWhere((element) => element.skaterID == e.skaterId).district,
+    "chestNumber": e.chestNumber,
+    "ageGroup": e.ageCategory,
+    "gender": allSkaters.firstWhere((element) => element.skaterID == e.skaterId).gender,
+    "selected_races": { for (var c in e.categoryResultModel) c.raceCategory: c.result },
+    "skate_category": e.skaterCategory,
+    "imgUrl": allSkaters.firstWhere((element) => element.skaterID == e.skaterId).profileImageUrl,
+    "mobileNumber": allSkaters.firstWhere((element) => element.skaterID == e.skaterId).contactNumber
+  }).toList() as List<Map<String, dynamic>>
+};
 
-      // Create a new PDF document to hold the combined certificates
-      final pw.Document combinedPdf = pw.Document();
+print(jsonResults);
 
-      int totalCertificates = results.length;
-      final ValueNotifier<int> currentCountNotifier = ValueNotifier<int>(0);
-
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Generating Certificates'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                CircularProgressIndicator(),
-                SizedBox(height: 20),
-                Text('Please do not close the tab and ensure proper internet connectivity.'),
-                SizedBox(height: 20),
-                ValueListenableBuilder<int>(
-                  valueListenable: currentCountNotifier,
-                  builder: (context, currentCount, _) {
-                    return Text('Generated: $currentCount/$totalCertificates certificates');
-                  },
-                ),
-              ],
-            ),
-          );
-        },
-      );
-
-      for (var result in results) {
-        String? profileUrl = '';
-
-        try {
-          // Fetch and update result for each event schedule
-          for (var categoryResultModel in result.categoryResultModel) {
-            String? resultId = findResultId(result.skaterId, categoryResultModel.eventScheduleId);
-            await ref.child('${categoryResultModel.eventScheduleId}/resultList/$resultId').update({'published': 'Published'});
-          }
-
-          // Fetch profile image URL for the participant
-          profileUrl = allSkaters.firstWhere((element) => element.skaterID==result.skaterId).profileImageUrl;
-          String skaterMobileNumber = allSkaters.firstWhere((element) => element.skaterID==result.skaterId).contactNumber;
-
-          // Generate certificate for the individual participant
-          await generateCertificate(result, profileUrl, imageUrl, textFields, combinedPdf,skaterMobileNumber);
-
-
-
-          // Update progress
-          currentCountNotifier.value++;
-
-
-          //current count is not updating in dialog box
-          // Rebuild dialog with updated count
-
-        } catch (e) {
-          Navigator.of(context, rootNavigator: true).pop(); // Close only the dialog
-
-          print('Error updating data: $e');
-
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error Occurred')));
-          return;
+        
+        final response = await http.post(
+          Uri.parse(apiUrl),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: jsonEncode(jsonResults),
+        );
+        
+        if (response.statusCode == 200) {
+          debugPrint("Success: ${response.body}");
+        } else {
+          debugPrint("Failed: ${response.statusCode} - ${response.body}");
         }
+      } catch (e) {
+        debugPrint("Error sending request: $e");
       }
-
-      // After all certificates are generated, save the combined PDF
-      final storageRefCombined = FirebaseStorage.instance
-          .ref()
-          .child('certificates/${widget.eventModel!.id}/combined_certificates.pdf');
-
-      // Save the combined PDF to bytes
-      final Uint8List combinedPdfBytes = await combinedPdf.save();
-
-      // Upload the combined PDF to Firebase Storage
-      await storageRefCombined.putData(combinedPdfBytes);
-      final String combinedPdfUrl = await storageRefCombined.getDownloadURL();
-
-      // Update Firebase with the combined PDF URL
-      final DatabaseReference combinedCertRef = database.ref().child("events/pastEvents/${widget.eventModel!.id}/combinedCertUrl");
-      await combinedCertRef.set(combinedPdfUrl);
-
-      final publishRef = database.ref().child('events/pastEvents/${widget.eventModel!.id}/published/');
-      publishRef.set('Published');
-
-      // Ensure only the dialog is closed
-
-      //close the dialog here. but it is actually closing the screen behind it . not the dialog
-
-      Navigator.of(context, rootNavigator: true).pop(); // Close only the dialog
-
-
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('All participants published successfully')));
-
-      showSuccessDialog('All participants published successfully');
-
-      setState(() {
-        results.clear();
-      });
-    }
-  }
-
-  void requestCertificateGeneration() {
-    List<Map<String, dynamic>> participants = [
-      {
-        "player_id": "player123",
-        "name": "John Doe",
-        "imgUrl": "https://example.com/player123.png",
-        "eventName": "Speed Skating Championship",
-        "dob": "2005-08-12",
-        "raceCategorywithResult": {
-          "100m": "1st Place",
-          "200m": "2nd Place",
-          "500m": "3rd Place",
-        },
-      },
-      {
-        "player_id": "player456",
-        "name": "Jane Smith",
-        "imgUrl": "https://example.com/player456.png",
-        "eventName": "Speed Skating Championship",
-        "dob": "2007-05-22",
-        "raceCategorywithResult": {
-          "100m": "2nd Place",
-          "200m": "1st Place",
-        },
-      },
-    ];
-
-    generateCertificates(eventId: "event789", participants: participants);
-  }
-
-
-  Future<void> generateCertificates({
-    required String eventId,
-    required List<Map<String, dynamic>> participants,
-  }) async {
-    final String apiUrl = 'http://127.0.0.1:5000/generate_certificates'; // Replace with your server IP
-
-    try {
-      // Construct the request payload
-      final Map<String, dynamic> requestData = {
-        "event_id": eventId,
-        "participants": participants,
-      };
-
-      // Make POST request
-      final response = await http.post(
-        Uri.parse(apiUrl),
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode(requestData),
-      );
-
-      // Check response status
-      if (response.statusCode == 200) {
-        final responseData = jsonDecode(response.body);
-        print("Certificates generated successfully!");
-
-        // Iterate through the response data
-        for (var participant in responseData['data']) {
-          print("Player ID: ${participant['player_id']}");
-          print("Certificate URL: ${participant['certificateUrl']}");
-          print("Completion Status: ${participant['completion_status']}");
-        }
-      } else {
-        print("Error: ${response.body}");
       }
-    } catch (e) {
-      print("Exception: $e");
     }
-  }
+
+
 
   void showSuccessDialog(String message) {
     showDialog(
@@ -425,143 +202,6 @@ class _PublishDataPageState extends State<PublishDataPage> {
     );
   }
 
-
-  Future<void> generateCertificate(ResultModel resultModel, String profileImageUrl, String imageUrl, List<Map<String, dynamic>> textFields, pw.Document combinedPdf, String skaterMobileNumber) async {
-
-    // Fetch the background image
-    final response = await http.get(Uri.parse(imageUrl));
-    if (response.statusCode != 200) {
-      throw Exception('Failed to load image');
-    }
-    final Uint8List imageData = response.bodyBytes;
-    final image = pw.MemoryImage(imageData);
-
-    // Profile image if provided
-    pw.Widget? profileWidget;
-    if (profileImageUrl.isNotEmpty) {
-      final profileResponse = await http.get(Uri.parse(profileImageUrl));
-      if (profileResponse.statusCode == 200) {
-        final profileImageData = profileResponse.bodyBytes;
-        final profileImage = pw.MemoryImage(profileImageData);
-        profileWidget = pw.Positioned(
-          top: 20,
-          right: 20,
-          child: pw.Image(profileImage, width: 100, height: 100),
-        );
-      }
-    }
-
-    // QR Code generation
-    final storageRef = FirebaseStorage.instance
-        .ref()
-        .child('certificates/${resultModel.eventId}/${resultModel.eventId}-${resultModel.skaterId}.pdf');
-    final String certurl = "https://firebasestorage.googleapis.com/v0/b/sportimsweb.appspot.com/o/certificates%2F${resultModel.eventId}%2F${resultModel.eventId}-${resultModel.skaterId}.pdf?alt=media";
-
-    final qrPainter = QrPainter(
-      data: certurl,
-      version: QrVersions.auto,
-      gapless: true,
-    );
-    final qrByteData = await qrPainter.toImageData(200);
-    final qrBytes = qrByteData!.buffer.asUint8List();
-    final qrImage = pw.MemoryImage(qrBytes);
-
-    // Generate the individual PDF document
-    final individualPdf = pw.Document();
-
-    // Add content to individual PDF
-    individualPdf.addPage(
-      pw.Page(
-        build: (context) {
-          return pw.Stack(
-            children: [
-              pw.Image(image, fit: pw.BoxFit.cover),
-              for (var field in textFields)
-                pw.Positioned(
-                  left: field['x'],
-                  top: field['y'],
-                  child: pw.Text(
-                    field['text'].replaceAll('\\n', '\n')
-                        .replaceAll("{{name}}", resultModel.skaterName)
-                        .replaceAll("{{chest_no}}", resultModel.chestNumber)
-                        .replaceAll("{{event_name}}", resultModel.eventName)
-                        .replaceAll("{{age_category}}", resultModel.ageCategory)
-                        .replaceAll("{{skater_category}}", resultModel.skaterCategory)
-                        .replaceAll("{{result}}", resultModel.categoryResultModel.map(
-                            (result) => '"${result.raceCategory}" : "${result.result}"').join('\n')),
-                    style: pw.TextStyle(
-                      color: PdfColor.fromInt(field['color']),
-                      fontSize: field['fontSize'],
-                    ),
-                  ),
-                ),
-              if (profileWidget != null) profileWidget,
-              pw.Positioned(
-                bottom: 20,
-                left: context.page.pageFormat.width / 2,
-                child: pw.Image(qrImage, width: 100, height: 100),
-              ),
-            ],
-          );
-        },
-      ),
-    );
-
-    // Add the same page to the combined PDF
-    combinedPdf.addPage(
-      pw.Page(
-        build: (context) {
-          return pw.Stack(
-            children: [
-              pw.Image(image, fit: pw.BoxFit.cover),
-              for (var field in textFields)
-                pw.Positioned(
-                  left: field['x'],
-                  top: field['y'],
-                  child: pw.Text(
-                    field['text'].replaceAll('\\n', '\n')
-                        .replaceAll("{{name}}", resultModel.skaterName)
-                        .replaceAll("{{chest_no}}", resultModel.chestNumber)
-                        .replaceAll("{{event_name}}", resultModel.eventName)
-                        .replaceAll("{{age_category}}", resultModel.ageCategory)
-                        .replaceAll("{{skater_category}}", resultModel.skaterCategory)
-                        .replaceAll("{{result}}", resultModel.categoryResultModel.map(
-                            (result) => '"${result.raceCategory}" : "${result.result}"').join('\n')),
-                    style: pw.TextStyle(
-                      color: PdfColor.fromInt(field['color']),
-                      fontSize: field['fontSize'],
-                    ),
-                  ),
-                ),
-              if (profileWidget != null) profileWidget,
-              pw.Positioned(
-                bottom: 20,
-                left: context.page.pageFormat.width / 2,
-                child: pw.Image(qrImage, width: 100, height: 100),
-              ),
-            ],
-          );
-        },
-      ),
-    );
-
-    // Save the individual PDF to bytes
-    final Uint8List individualPdfBytes = await individualPdf.save();
-
-    // Upload the individual PDF to Firebase Storage
-    await storageRef.putData(individualPdfBytes);
-    final String firebasePdfUrl = await storageRef.getDownloadURL();
-
-    // Update Firebase with the individual certificate URL
-    final DatabaseReference userRef = database.ref().child("skaters/$skaterMobileNumber/events/${resultModel.eventId}/certUrl");
-    await userRef.set(firebasePdfUrl);
-
-    // // Open the individual PDF in a new browser tab (for web)
-    // final blob = html.Blob([individualPdfBytes], 'application/pdf');
-    // final url = html.Url.createObjectUrlFromBlob(blob);
-    // html.window.open(url, "_blank");
-    // html.Url.revokeObjectUrl(url);  // Clean up the blob URL
-  }
 
   String? findResultId(String skaterId, String scheduleId) {
     try {
@@ -616,20 +256,23 @@ class _PublishDataPageState extends State<PublishDataPage> {
                         borderRadius: BorderRadius.circular(10),
                         // border: Border.all(color: Colors.grey),
                       ),
-                      child: Text(enablePublish?
-                        "Disclaimer: Once participants are published, the action cannot be undone.":"Result Published",
+                      child: Text(
+                        "Disclaimer: Once participants are published, the action cannot be undone.",
                         style: TextStyle(fontSize: 14, color: Colors.white,fontWeight: FontWeight.bold),
                       ),
                     ),
 
                     Expanded(child: Container()),
-                    if(enablePublish)Container(
+                    Container(
                       decoration: BoxDecoration(
                         color: Color(0xffdde7f9),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: TextButton.icon(
-                        onPressed: (){},
+                        onPressed: (){
+                          publishAllParticipants();
+
+                        },
                         icon: Icon(
                           Icons.publish,
                           color: Color(0xff276ad5),

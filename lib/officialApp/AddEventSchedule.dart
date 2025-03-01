@@ -57,6 +57,7 @@ class _AddEventScheduleState extends State<AddEventSchedule> {
       allParticipants = model.eventParticipants;
       eventNames.add(model.eventName);
       eventName = model.eventName;
+      
 
       raceCategory = raceCategories.first;
       ageCategory = ageCategories.first;
@@ -97,6 +98,8 @@ class _AddEventScheduleState extends State<AddEventSchedule> {
       //     element.skaterCategory.contains(skaterCategory) &&
       //     !filteredParticipantIds.contains(element.skaterId)).toList();
 
+      
+
       filteredParticipants = allParticipants.where((element) {
 
         print(' ${element.gender.contains(selectedGender)} ${element.raceCategory.contains(raceCategory)} ${element.skaterCategory==skaterCategory} ${ageCategory.toLowerCase().contains('above')? selectedAge<int.parse(element.age):(int.parse(element.age)==selectedAge||int.parse(element.age)==selectedAge-1)}');
@@ -105,7 +108,12 @@ class _AddEventScheduleState extends State<AddEventSchedule> {
               element.skaterCategory==skaterCategory &&
           (ageCategory.toLowerCase().contains('above')? selectedAge<int.parse(element.age):(int.parse(element.age)==selectedAge||int.parse(element.age)==selectedAge-1));
       }).toList();
-
+      // Remove participants already in eventScheduleModelList for the selected race category
+      for (var schedule in widget.eventScheduleModelList) {
+        if (schedule.raceCategory == raceCategory) {
+          filteredParticipants.removeWhere((participant) => schedule.participants.contains(participant.skaterId));
+        }
+      }
       });
   }
 
