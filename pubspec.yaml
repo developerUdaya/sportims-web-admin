@@ -1,0 +1,78 @@
+name: sport_ims
+description: "A new Flutter project."
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.2.5 <4.0.0'
+dependencies:
+
+
+  flutter:
+    sdk: flutter
+  amplify_core: '<1.0.0'
+  amplify_auth_cognito: '<1.0.0'
+  amplify_storage_s3: '<1.0.0'
+  cupertino_icons: ^1.0.2
+  pie_chart: ^5.0.0
+  intl: ^0.19.0
+  image_picker: ^1.1.2
+  web: ^1.0.0
+
+  firebase_core: ^3.1.0
+  firebase_database: ^11.0.1
+  firebase_auth: ^5.2.0
+  data_table_2: ^2.3.2
+  lottie: ^3.1.2
+
+  morphing_text: ^1.0.1
+  url_launcher: ^6.2.6
+  file_picker: ^8.0.3
+  paged_datatable: 2.1.1
+  firebase_storage: ^12.0.0
+  device_info_plus: ^10.0.2
+  easy_pdf_viewer: ^1.0.8
+  cached_network_image: ^3.3.1
+  google_fonts: ^6.2.1
+  excel: ^3.0.0
+  pdf: ^3.6.5
+  printing: ^5.9.1
+
+  dio: ^5.0.0
+  image: ^4.0.02
+  qr_flutter: ^4.0.0
+  flutter_svg: ^2.0.10+1
+  http: ^1.2.1
+  image_cropper: ^8.0.2
+  dotted_border: ^2.1.0
+  just_audio: ^0.9.40
+  flutter_colorpicker: ^1.1.0
+  flutter_otp_text_field: ^1.2.0
+
+#  qr_flutter: ^5.0.2
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+# following page: https://dart.dev/tools/pub/pubspec
+  flutterx_table: ^1.2.3
+# The following section is specific to Flutter packages.
+flutter:
+  uses-material-design: true
+  assets:
+     - assets/
+  fonts:
+    - family: sofachrome
+      fonts:
+        - asset: fonts/sofachrome-rg.otf
+    - family: times
+      fonts:
+        - asset: fonts/times.otf
+
+    - family: FjallaOne
+      fonts:
+        - asset: fonts/FjallaOne-Regular.ttf
+
+    - family: TiltWarp
+      fonts:
+        - asset: fonts/TiltWarp-Regular.ttf
