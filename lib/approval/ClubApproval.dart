@@ -360,6 +360,7 @@ class _ClubApprovalState extends State<ClubApproval> {
               },
               columns: const [
                 DataColumn(label: Text('S.No')),
+                DataColumn(label: Text('Club ID')),
                 DataColumn(label: Text('Club Name')),
                 DataColumn(label: Text('Address')),
                 DataColumn(label: Text('District')),
@@ -428,6 +429,7 @@ class MyData extends DataTableSource {
     final Club club = data[index];
     return DataRow.byIndex(index: index, cells: [
       DataCell(Text((index + 1).toString())),
+      DataCell(Text(club.id ?? "")),
       DataCell(Text(club.clubName ?? "")),
       DataCell(buildEllipseTextContainer( club.address ?? "",150)),
       DataCell(Text(club.district ?? "")),

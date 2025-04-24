@@ -65,7 +65,7 @@ class _DistrictClubsParticipantsPageState extends State<DistrictClubsParticipant
     if (snapshot.exists) {
       for (final child in snapshot.children) {
         Club club = Club.fromJson(Map<String, dynamic>.from(child.value as Map));
-        if (club.district == widget.districtName) {
+        if (club.district == widget.districtName && club.approval == 'Approved') {
           clubList.add(club);
         }
       }

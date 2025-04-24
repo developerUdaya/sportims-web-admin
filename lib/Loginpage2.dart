@@ -137,24 +137,24 @@ class _LoginPageState extends State<LoginPage> {
                             )
                         )
                     ),
-                    SizedBox(height: 20),
-                    TextButton(
-                      onPressed: () {
-                        showDialog(
-                          context: context,
-                          barrierDismissible: false,
-                          builder: (BuildContext context) {
-                            return Center(child: CircularProgressIndicator());
-                          },
-                        );
+                    // SizedBox(height: 20),
+                    // TextButton(
+                    //   onPressed: () {
+                    //     showDialog(
+                    //       context: context,
+                    //       barrierDismissible: false,
+                    //       builder: (BuildContext context) {
+                    //         return Center(child: CircularProgressIndicator());
+                    //       },
+                    //     );
 
-                      },
-                      child: Text('Forgot Password?',
-                      style: TextStyle(
-                        color: Colors.black
-                      ),),
+                    //   },
+                    //   child: Text('Forgot Password?',
+                    //   style: TextStyle(
+                    //     color: Colors.black
+                    //   ),),
 
-                    ),
+                    // ),
                     SizedBox(height: 20),
                     if(showInvalid)Text("Invalid Credentials",style: TextStyle(color: Colors.red),)
                     // Row(

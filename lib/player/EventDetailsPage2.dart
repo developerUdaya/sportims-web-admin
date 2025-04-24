@@ -145,21 +145,21 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                                   ),
                                 ],
                               ),
-                              SizedBox(height: 16),
+                              // SizedBox(height: 16),
 
-                              //Event Prefix
-                              Row(
-                                children: [
-                                  Icon(Icons.numbers, color: Colors.blue),
-                                  SizedBox(width: 8),
-                                  Text(
-                                    'Event Prefix : ${event!.eventPrefixName ?? ""}',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                              // //Event Prefix
+                              // Row(
+                              //   children: [
+                              //     Icon(Icons.numbers, color: Colors.blue),
+                              //     SizedBox(width: 8),
+                              //     Text(
+                              //       'Event Prefix : ${event!.eventPrefixName ?? ""}',
+                              //       style: TextStyle(
+                              //         fontSize: 16,
+                              //       ),
+                              //     ),
+                              //   ],
+                              // ),
                               SizedBox(height: 16),
                               Divider(),
 

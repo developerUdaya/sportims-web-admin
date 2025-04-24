@@ -59,7 +59,7 @@ Widget buildTitleAndDropdown(String title, String hintText, List<String> items, 
   );
 }
 
-Widget buildTitleAndField(String title, String hintText, {bool isMultiline = false, required TextEditingController controller, List<TextInputFormatter>? inputFormatters,  bool readOnly=false}) {
+Widget buildTitleAndField(String title, String hintText, {bool isNumberOnly = false,bool isMultiline = false, required TextEditingController controller, List<TextInputFormatter>? inputFormatters,  bool readOnly=false}) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
@@ -77,7 +77,8 @@ Widget buildTitleAndField(String title, String hintText, {bool isMultiline = fal
         decoration: _inputDecoration(hintText),
         maxLines: isMultiline ? 5 : 1,
         inputFormatters: inputFormatters,
-        keyboardType: TextInputType.number,
+        keyboardType: isNumberOnly ? TextInputType.number : TextInputType.text,
+        // keyboardType: TextInputType.number,
         validator: (value) {
           if (value == null || value.isEmpty) {
             return 'This field cannot be empty';
@@ -658,12 +659,11 @@ Widget GlassmorphismCalendarEventCard(EventModel event, EventParticipantsModel p
                         ),
                         TextButton(onPressed: () async {
 
-                          DatabaseReference userRef = FirebaseDatabase.instance.ref();
-                          DataSnapshot  snapshot = await userRef.child('skater/${participant.skaterId}/events/${event.id}/certUrl').get();
-
-                          String url = snapshot.value as String;
-                          if(url.isNotEmpty){
-                            launchURL(url);
+                          String url = "http://103.174.10.153:8000/certificates/${event.id}/certificate_${participant.chestNumber}_${participant.skaterId}_${event.id}.png";
+                          if (await canLaunch(url)) {
+                            await launch(url);
+                          } else {
+                            throw 'Could not launch $url';
                           }
 
                         }, child: Text('View Certificate', style: TextStyle(color: Colors.blue),)),

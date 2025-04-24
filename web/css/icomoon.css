@@ -1,0 +1,75 @@
+@font-face {
+  font-family: 'icomoon';
+  src:  url('https://kheloindia.gov.in/fonts/icomoon.eot?bl5jme');
+  src:  url('https://kheloindia.gov.in/fonts/icomoon.eot?bl5jme#iefix') format('embedded-opentype'),
+    url('https://kheloindia.gov.in/fonts/icomoon.ttf?bl5jme') format('truetype'),
+    url('https://kheloindia.gov.in/fonts/icomoon.woff?bl5jme') format('woff'),
+    url('https://kheloindia.gov.in/fonts/icomoon.svg?bl5jme#icomoon') format('svg');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+[class^="icon-"], [class*=" icon-"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'icomoon' !important;
+  speak: never;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-Annual-Sports:before {
+  content: "\e900";
+  color: #1e4182;
+}
+.icon-community_coaching_development:before {
+  content: "\e901";
+  color: #f49700;
+}
+.icon-Peace-of-mind:before {
+  content: "\e902";
+  color: #1e4182;
+}
+.icon-physical-fitness:before {
+  content: "\e903";
+  color: #1e4182;
+}
+.icon-playfield-development:before {
+  content: "\e904";
+  color: #1e4182;
+}
+.icon-Promotion-of-rular:before {
+  content: "\e905";
+  color: #1e4182;
+}
+.icon-Promotion:before {
+  content: "\e906";
+  color: #1e4182;
+}
+.icon-Sports-for-women:before {
+  content: "\e907";
+  color: #1e4182;
+}
+.icon-state-level:before {
+  content: "\e908";
+  color: #1e4182;
+}
+.icon-Support-to-national:before {
+  content: "\e909";
+  color: #1e4182;
+}
+.icon-talent-Search:before {
+  content: "\e90a";
+  color: #1e4182;
+}
+.icon-Upgragtion-of-Sports:before {
+  content: "\e90b";
+  color: #1d4081;
+}

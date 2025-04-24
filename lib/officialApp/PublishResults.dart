@@ -146,7 +146,7 @@ class _PublishDataPageState extends State<PublishDataPage> {
     "eventId": e.eventId,
     "skaterId": e.skaterId,
     "club": allSkaters.firstWhere((element) => element.skaterID == e.skaterId).club,
-    "dateOfBirth": e.ageCategory,
+    "dateOfBirth": allSkaters.firstWhere((element) => element.skaterID == e.skaterId).dateOfBirth,
     "district": allSkaters.firstWhere((element) => element.skaterID == e.skaterId).district,
     "chestNumber": e.chestNumber,
     "ageGroup": e.ageCategory,

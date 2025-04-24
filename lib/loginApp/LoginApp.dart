@@ -1,4 +1,6 @@
 
+import 'dart:convert';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
@@ -7,6 +9,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:morphing_text/morphing_text.dart';
 import 'package:lottie/lottie.dart';
 
+import 'package:http/http.dart' as http;
 import '../clubApp/ClubApp.dart';
 import '../districtApp/DistrictApp.dart';
 import '../main.dart';
@@ -203,6 +206,10 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> sendOTP(BuildContext context) async {
+
+        if (_phoneController.text.trim().length == 12) {
+      showAadhaarDialog();
+    } else {
     // Save the context of the dialog for later use
     BuildContext? dialogContext;
 
@@ -272,6 +279,124 @@ class _LoginPageState extends State<LoginPage> {
       _showSnackBar('Error sending OTP: $e');
     }
   }
+  }
+ 
+ 
+  Future<void> sendAadhaarOTP(String aadhaar, String mobile) async {
+    final url = 'http://103.174.10.153:4381/generate-otp/$aadhaar/$mobile/';
+    BuildContext? dialogContext;
+
+    // Show the progress indicator dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        dialogContext = context; // Assign dialog context
+        return const Center(
+          child: CircularProgressIndicator(color: Colors.blueAccent),
+        );
+      },
+    );
+
+    try {
+      final response = await http.post(Uri.parse(url));
+      if (response.statusCode == 200) {
+        print(response.body);
+        final verificationId = jsonDecode(response.body)['reference_id'].toString() ?? '';
+        Navigator.pop(dialogContext!); // Close the progress dialog
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) {
+            return AadhaarOTPDialog(verificationId: verificationId, userMobileNumber: mobile,aadhaarNumber: aadhaar,); // Display Aadhaar OTP dialog
+          },
+        );
+      } else {
+        Navigator.pop(dialogContext!); // Close the progress dialog
+        _showSnackBar('Failed to send OTP. Please try again.');
+      }
+    } catch (e) {
+      Navigator.pop(dialogContext!); // Close the progress dialog
+      _showSnackBar('Error sending OTP: $e');
+    }
+  }
+  Future<void> verifyAadhaarOTP(String verificationId, String otp, String aadhaar, String mobile) async {
+    final url = 'http://103.174.10.153:4381/verify-aadhaar-otp/$verificationId/aadhaar/$mobile/$aadhaar';
+    final body = jsonEncode({'otp': otp});
+    BuildContext? dialogContext;
+
+    // Show the progress indicator dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        dialogContext = context; // Assign dialog context
+        return const Center(
+          child: CircularProgressIndicator(color: Colors.blueAccent),
+        );
+      },
+    );
+
+    try {
+      final response = await http.post(Uri.parse(url), body: body, headers: {'Content-Type': 'application/json'});
+      if (response.statusCode == 200) {
+        Navigator.pop(dialogContext!); // Close the progress dialog
+        _navigateToSkaterHome();
+      } else {
+        Navigator.pop(dialogContext!); // Close the progress dialog
+        _showSnackBar('Failed to verify OTP. Please try again.');
+      }
+    } catch (e) {
+      Navigator.pop(dialogContext!); // Close the progress dialog
+      _showSnackBar('Error verifying OTP: $e');
+    }
+  }
+
+  void showAadhaarDialog() {
+    final TextEditingController aadhaarController = TextEditingController();
+    final TextEditingController mobileController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Enter Aadhaar and Mobile Number'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: aadhaarController,
+                decoration: InputDecoration(labelText: 'Aadhaar Number'),
+                keyboardType: TextInputType.number,
+              ),
+              TextField(
+                controller: mobileController,
+                decoration: InputDecoration(labelText: 'Mobile Number'),
+                keyboardType: TextInputType.phone,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                sendAadhaarOTP(aadhaarController.text, mobileController.text);
+              },
+              child: Text('Send OTP'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  
 
 
   void _showSnackBar(String message) {
@@ -507,12 +632,12 @@ class _LoginPageState extends State<LoginPage> {
                                 if (isSignIn)SizedBox(height: 20),
                                 if (isSignIn)CustomTextField(
                                     label: 'Password', obscureText: true, controller: _passwordController,),
-                                SizedBox(height: 10),
-                                if (isSignIn)
-                                  TextButton(
-                                    onPressed: () {},
-                                    child: Text('Forgot your password?'),
-                                  ),
+                                // SizedBox(height: 10),
+                                // if (isSignIn)
+                                //   TextButton(
+                                //     onPressed: () {},
+                                //     child: Text('Forgot your password?'),
+                                //   ),
 
                                 SizedBox(height: 10),
 
@@ -819,12 +944,12 @@ class _LoginPageState extends State<LoginPage> {
                               CustomTextField(label: 'Confirm Password', obscureText: true, controller: _passwordController,),
                             ],
                             SizedBox(height: 10),
-                            if (isSignIn)
-                              TextButton(
-                                onPressed: () {},
-                                child: Text('Forgot your password?'),
-                              ),
-                            SizedBox(height: 20),
+                            // if (isSignIn)
+                            //   TextButton(
+                            //     onPressed: () {},
+                            //     child: Text('Forgot your password?'),
+                            //   ),
+                            // SizedBox(height: 20),
                             ElevatedButton(
                               onPressed: () {},
                               style: ElevatedButton.styleFrom(
@@ -1327,3 +1452,134 @@ class _OTPDialogState extends State<OTPDialog> {
     );
   }
 }
+
+
+
+  class AadhaarOTPDialog extends StatefulWidget {
+    final String verificationId;
+    final String userMobileNumber;
+    final String aadhaarNumber;
+
+    AadhaarOTPDialog({required this.verificationId, required this.userMobileNumber, required this.aadhaarNumber});
+
+    @override
+    _AadhaarOTPDialogState createState() => _AadhaarOTPDialogState();
+  }
+
+  class _AadhaarOTPDialogState extends State<AadhaarOTPDialog> {
+    final TextEditingController _otpController = TextEditingController();
+
+    void _showSnackBar(String message) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    }
+
+    Future<void> _submitOTP() async {
+      if (_otpController.text.length == 6) {
+        try {
+          final url = 'http://103.174.10.153:4381/verify-aadhaar-otp/${widget.verificationId}/aadhaar/${widget.userMobileNumber}/${_otpController.text}';
+          final response = await http.post(Uri.parse(url));
+          if (response.statusCode == 200) {
+            Navigator.pop(context); // Close the OTP dialog
+            _navigateToSkaterHome();
+          } else {
+            _showSnackBar('Failed to verify OTP. Please try again.');
+          }
+        } catch (e) {
+          _showSnackBar('Error verifying OTP: $e');
+        }
+      } else {
+        _showSnackBar('Please enter a valid 6-digit OTP.');
+      }
+    }
+
+    Future<void> _navigateToSkaterHome() async {
+      DatabaseReference dbRef = FirebaseDatabase.instance.ref().child('skaters/${widget.userMobileNumber}/approval/');
+      DataSnapshot snapshot = await dbRef.get();
+      if (snapshot.value != null) {
+        if (snapshot.value == "Approved") {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => PlayerScreen(userMobileNumber: widget.userMobileNumber))); // Navigate to PlayerScreen
+        } else {
+          showErrorDialog('Skater not approved, Kindly wait for approval');
+        }
+      } else {
+        showErrorDialog('Skater not Registered, Kindly register new account');
+      }
+    }
+
+    void showErrorDialog(String message) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Error"),
+            content: Text(message),
+            actions: <Widget>[
+              TextButton(
+                child: Text("OK"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+
+    @override
+    Widget build(BuildContext context) {
+      return AlertDialog(
+        content: Container(
+          width: 400,
+          height: 250,
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.all(Radius.circular(15)),
+          ),
+          child: Column(
+            children: [
+              const Text(
+                'Enter Received OTP',
+                style: TextStyle(color: Colors.black, fontWeight: FontWeight.w900, fontSize: 18),
+              ),
+              const SizedBox(height: 20),
+              TextField(
+                controller: _otpController,
+                maxLength: 6,
+                textAlign: TextAlign.center,
+                decoration: const InputDecoration(
+                  counterText: "",
+                  border: OutlineInputBorder(),
+                ),
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+                keyboardType: TextInputType.number,
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: Text('Cancel'),
+                  ),
+                  ElevatedButton(
+                    onPressed: _submitOTP,
+                    child: Text('Submit'),
+                  ),
+                ],
+              )
+            ],
+          ),
+        ),
+        contentPadding: const EdgeInsets.all(0),
+      );
+    }
+  }
+

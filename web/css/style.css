@@ -1,0 +1,248 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body{
+    font-family: 'Lato', sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+    background-color: #f5f8fa;
+}
+
+#header{
+    text-transform: uppercase;
+    background-color: transparent;
+}
+
+#header .logo-white {
+    width: 110px;
+    height: 60px;
+}
+#header .nav-link{
+    font-size: 14px;
+    margin: 0 10px;
+    color: #ffffff;
+    padding: 8px 20px;
+}
+
+#header  .nav-link.active{
+    background-color: #009FD8;
+    border-radius: 6px;
+    color:white;
+}
+
+.header-home .nav-link.active{
+    background-color: #009FD8 !important;
+    border-radius: 6px !important;
+    color:white !important;
+}
+.header-2 .nav-link{
+    color: black !important;
+}
+.header-2{
+    background-color: white !important;
+}
+
+.banner{
+   
+   
+   
+   
+    min-height: 400px;
+   
+}
+
+.banner-section .nav-item .nav-link{
+    color: #009FD8;
+    padding: 8px 20px;
+    margin: 0 10px;
+    text-transform: uppercase;
+}
+
+.banner-section .nav-item .active{
+    background-color:#009FD8;
+    color: white;
+}
+
+.banner-section .accordian-box{
+    border-bottom: 1px dashed #999999;
+  /* border-bottom-style: dotted; */
+}
+.banner-section .accordian-box h4{
+    font-size: 14px;
+    font-weight: 700;
+    color: #999999;;
+}
+
+.banner-section .accordian-box p{
+    font-size: 15px;
+    font-size: 400;
+    color: #545050;
+}
+
+ .accordion-button:not(.collapsed){
+    background-color: #98d2e7 !important;
+    color: #009FD8;
+    font-weight: 700;
+}
+
+.banner-section .accordion-header{
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1.5;
+}
+
+.banner-section .download-btn{
+    border: 1px solid #009FD8;
+    background-color: #009FD8;
+    color: white;
+    border-radius: 6px;
+    padding: 5px 25px;
+    margin: 0 10px;
+    
+}
+
+
+
+#pledge .pic-pledge{
+    background-color: rgba(244,151,0,0.5);
+    /* padding: 12px 10px 40px 40px; */
+    transform: skewX(-2deg);
+    padding: 10px;
+}
+
+#pledge .pic-pledge .pledge-btn .pledge_btn{
+    background-color:#1e4182;
+    color: white;
+    padding: 0px 60px;
+    border-radius: 25px;
+    border: 1px solid #1e4182;
+    font-size: 24px;
+    letter-spacing: 0.5px;
+    font-weight: 900;
+}
+
+#pledge .pic-pledge .numbers{
+    width: 320px;
+    flex-wrap: wrap;
+}
+
+#pledge .pic-pledge .number-box {
+        border: 3px solid #1e4182;
+        border-radius: 3px;
+        padding: 5px;
+
+}
+
+#pledge .pic-pledge .numbers .num{
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #1e4182;
+    border: 1px solid #1e4182;
+    border-radius: 3px;
+    color: white;
+    /* padding: 4px 8px; */
+    padding: 0px;
+    font-size: 18px;
+    font-weight: 900;
+}
+
+#pledge .hindi-text{
+    color: #4a4949;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.85px;
+}
+
+.footer{
+    background-color:#1e4182;
+}
+
+.social.box .bi::before, [class^="bi-"]::before, [class*=" bi-"]::before{
+    font-size: 22px;
+    padding: 10px;
+    border:1px solid white;
+    color: white;
+    border-radius: 5px;
+}
+
+.twitter-page{
+    max-height: 500px;
+    width: 330px;
+    overflow-y: scroll;
+    border-radius: 25px;
+}
+.fb-posts{
+    border-radius: 25px;
+}
+#aboutVertical .box{
+    background-color: #0b2454 !important;
+    color: white;
+}
+.custom-arrows{
+    list-style: none;
+    position: relative;
+}
+.custom-arrows li::before {
+    content: '\00BB';
+    margin-right: 15px;
+ position: absolute;
+ font-size: 26px;
+ color: #009FD8;
+ left: 2%;
+ display: contents;
+}
+
+.playstore_btn{
+    background-color: #000000;
+    color: white;
+    border-radius: 10px;
+    padding: 10px 4px;
+} 
+.playstore_btn img{
+    height: 28px;
+    margin-left: 2px;
+} 
+.app_btn{
+    background-color: #007AFF;
+    color: white;
+    border-radius: 10px;
+    padding: 10px 4px;
+}
+.app_btn img{
+    height: 28px;
+    margin-left: 2px; 
+}
+#downloadappmodal .modal-dialog{
+    width: 75vw !important;
+}
+@media screen and (max-width:576px) {
+    #downloadappmodal .modal-dialog{
+        width: 90vw !important;
+    }
+}
+.custom_right_br{
+    border-right: 1px solid #dedede;
+}
+@media screen and (max-width:767px) {
+    .custom_right_br{
+        border-right: 0px;
+    }
+}
+.app_img{
+    height: 75px;
+}
+.youth-games-btn{
+    background: linear-gradient(135deg, #1d1649 0%, #9f272a 100%) !important;
+    font-size: 22px !important;
+}
+.winter-games-btn{
+    background: linear-gradient(135deg, #485296 0%, #8F3481 100%) !important;
+    font-size: 22px !important;
+
+}

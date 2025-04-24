@@ -250,6 +250,7 @@ class _DistrictSecretaryDataState extends State<DistrictSecretaryData> {
                         },
                         columns: const [
                           DataColumn(label: Text('S.No')),
+                          DataColumn(label: Text('DS ID')),
                           DataColumn(label: Text('Name')),
                           DataColumn(label: Text('District')),
                           DataColumn(label: Text('Contact')),
@@ -443,6 +444,7 @@ class MyData extends DataTableSource {
       index: index,
       cells: [
         DataCell(Text((index + 1).toString())),
+        DataCell(Text(secretary.id ?? "")),
         DataCell(Text(secretary.name ?? "")),
         DataCell(Text(secretary.districtName ?? "")),
         DataCell(Text(secretary.contactNumber ?? "")),

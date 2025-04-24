@@ -49,7 +49,7 @@ class _DistrictClubsSkatersPageState extends State<DistrictClubsSkatersPage> {
         Club club = Club.fromJson(Map<String, dynamic>.from(child.value as Map));
         print('fetchClubsAndSkaters end');
 
-        if (club.district == widget.districtName) {
+        if (club.district == widget.districtName && club.approval == 'Approved') {
           print('fetchClubsAndSkaters if');
 
           print("Club name ${club.district}  == ${widget.districtName}");

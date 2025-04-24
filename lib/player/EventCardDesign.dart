@@ -8,6 +8,8 @@ class EventCard extends StatelessWidget {
   final String chestNumber;
   final String raceDetails;
   final String imgUrl;
+  final String eventId;
+  final String skaterID;
 
   EventCard({
     required this.eventName,
@@ -16,6 +18,8 @@ class EventCard extends StatelessWidget {
     required this.chestNumber,
     required this.raceDetails,
     required this.imgUrl,
+    required this.eventId,
+    required this.skaterID
   });
 
   @override
@@ -73,6 +77,7 @@ class EventCard extends StatelessWidget {
                     child: ElevatedButton(
                       onPressed: () {
                         // Add your functionality for viewing the certificate
+
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue[700],

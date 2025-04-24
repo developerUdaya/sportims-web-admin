@@ -158,7 +158,7 @@ class SkaterEditRegistrationFormState extends State<SkaterEditRegistrationForm> 
                     Expanded(
                       child: buildTitleAndField(
                         'Date of Birth',
-                        'Enter date of birth',
+                        'Enter date of birth (DD-MM-YYY)',
                         controller: _dobController,
                         inputFormatters: [DateInputFormatter()],
                       ),

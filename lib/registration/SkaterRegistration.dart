@@ -28,7 +28,7 @@ class SkaterRegistration extends StatelessWidget {
       home: Scaffold(
         backgroundColor: Colors.transparent,
         body: Container(
-          width: 500,
+          width: 1000,
 
           padding: const EdgeInsets.all(15),
           decoration: BoxDecoration(
@@ -469,210 +469,207 @@ class SkaterRegistrationFormState extends State<SkaterRegistrationForm> {
       body: SingleChildScrollView(
         child: Form(
           key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Row(
-                children: [
-                  Expanded(
-                    child: buildTitleAndField('Name', 'Enter name',
-                        controller: _nameController),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: buildTitleAndField('Date of Birth',
-                        'Enter date of birth', controller: _dobController,
-                      inputFormatters: [DateInputFormatter()],
+          child: Container(
+            width: 500,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                buildTitleAndField('Name', 'Enter name',
+                    controller: _nameController),
+                const SizedBox(width: 16),
 
+                //TODO ADD CALNEDAR OPTION ALONG WITH TEXT FIELD
+                 buildTitleAndField('Date of Birth ',
+                     'Enter date of birth (DD-MM-YYYY)', controller: _dobController,
+                   inputFormatters: [DateInputFormatter()],
+                             
+                 ),
+                const SizedBox(height: 16),
+                buildTitleAndField('Residential Address', 'Enter address',
+                    isMultiline: true, controller: _addressController),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: buildTitleAndDropdown('Select State', 'Select state',
+                          Constants().states.map((e) => e.name).toList(), _selectedState, (value) {
+                            setState(() {
+                              _selectedState = value;
+                              _selectedDistrict=null;
+                            });
+                          }),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              buildTitleAndField('Residential Address', 'Enter address',
-                  isMultiline: true, controller: _addressController),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  Expanded(
-                    child: buildTitleAndDropdown('Select State', 'Select state',
-                        Constants().states.map((e) => e.name).toList(), _selectedState, (value) {
-                          setState(() {
-                            _selectedState = value;
-                            _selectedDistrict=null;
-                          });
-                        }),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: buildTitleAndDropdown('Select District',
-                        'Select district', Constants().districts.where((element) => element.state.toLowerCase()==_selectedState?.toLowerCase(),).map((e) => e.name).toList(),
-                        _selectedDistrict, (value) {
-                          setState(() {
-                            _selectedDistrict = value;
-                            _selectedClub=null;
-                          });
-                        }),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              buildTitleAndField('Name of School/College', 'Enter school name',
-                  controller: _schoolController),
-              const SizedBox(height: 16),
-              buildTitleAndField('School Affiliation Number',
-                  'Enter school affiliation number',
-                  controller: _affiliationNumberController),
-              const SizedBox(height: 16),
-              buildTitleAndDropdown('Select Club', 'Select club',
-                  _clubsList
-                      .where((element) => element['district'] == _selectedDistrict)
-                      .map<String>((e) => e['clubname'] as String) // Explicitly cast to String
-                      .toList(),
-                  _selectedClub, (value) {
-                    setState(() {
-                      _selectedClub = value;
-                    });
-                  }),
-              const SizedBox(height: 16),
-              buildTitleAndField('Email ID', 'Enter email ID',
-                  controller: _emailController),
-              const SizedBox(height: 16),
-              buildTitleAndField('Contact Number', 'Enter contact number',
-                  controller: _contactNumberController),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  Expanded(
-                    child: buildTitleAndDropdown('Blood Group', 'Select blood group',
-                        ['A+', 'B+', 'O+', 'AB+', 'A-', 'B-', 'O-', 'AB-'],
-                        _selectedBloodGroup, (value) {
-                          setState(() {
-                            _selectedBloodGroup = value;
-                          });
-                        }),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: buildTitleAndDropdown('Gender', 'Select gender',
-                        ['Male', 'Female', 'Other'], _selectedGender, (value) {
-                          setState(() {
-                            _selectedGender = value;
-                          });
-                        }),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              buildTitleAndDropdown('Category', 'Select category',
-                  ['Beginner', 'Fancy', 'Quad', 'Inline'], _selectedCategory,
-                      (value) {
-                    setState(() {
-                      _selectedCategory = value;
-                    });
-                  }),
-              const SizedBox(height: 16),
-              buildTitleAndField('Aadhar/Birth Certificate Number ',
-                  'Enter Aadhar/Birth certificate number',
-                  controller: _aadharController),
-              const SizedBox(height: 16),
-              GestureDetector(
-                onTap: _pickProfilePhoto,
-                child: Container(
-                  height: 150,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                  child: Center(
-                    child: _profilePhotoData != null
-                        ? Image.memory(_profilePhotoData!)
-                        : Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.image, size: 40, color: Colors.grey),
-                        TextButton(
-                          onPressed: _pickProfilePhoto,
-                          child: const Text('Drop your image or browse'),
-                        ),
-                        const Text(
-                          'JPEG or PNGs only • 8MB max',
-                          style: TextStyle(fontSize: 12, color: Colors.grey),
-                        ),
-                        if(profileImageError)const Text(
-                          'please upload profile photo',
-                          style: TextStyle(fontSize: 10, color: Colors.red),
-                        ),
-                      ],
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: buildTitleAndDropdown('Select District',
+                          'Select district', Constants().districts.where((element) => element.state.toLowerCase()==_selectedState?.toLowerCase(),).map((e) => e.name).toList(),
+                          _selectedDistrict, (value) {
+                            setState(() {
+                              _selectedDistrict = value;
+                              _selectedClub=null;
+                            });
+                          }),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                buildTitleAndField('Name of School/College', 'Enter school name',
+                    controller: _schoolController),
+                const SizedBox(height: 16),
+                buildTitleAndField('School Affiliation Number',
+                    'Enter school affiliation number',
+                    controller: _affiliationNumberController),
+                const SizedBox(height: 16),
+                buildTitleAndDropdown('Select Club', 'Select club',
+                    _clubsList
+                        .where((element) => element['district'] == _selectedDistrict)
+                        .map<String>((e) => e['clubname'] as String) // Explicitly cast to String
+                        .toList(),
+                    _selectedClub, (value) {
+                      setState(() {
+                        _selectedClub = value;
+                      });
+                    }),
+                const SizedBox(height: 16),
+                buildTitleAndField('Email ID', 'Enter email ID',
+                    controller: _emailController),
+                const SizedBox(height: 16),
+                buildTitleAndField('Contact Number', 'Enter contact number',
+                    controller: _contactNumberController),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: buildTitleAndDropdown('Blood Group', 'Select blood group',
+                          ['A+', 'B+', 'O+', 'AB+', 'A-', 'B-', 'O-', 'AB-'],
+                          _selectedBloodGroup, (value) {
+                            setState(() {
+                              _selectedBloodGroup = value;
+                            });
+                          }),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: buildTitleAndDropdown('Gender', 'Select gender',
+                          ['Male', 'Female', 'Other'], _selectedGender, (value) {
+                            setState(() {
+                              _selectedGender = value;
+                            });
+                          }),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                buildTitleAndDropdown('Category', 'Select category',
+                    ['Beginner', 'Fancy', 'Quad', 'Inline'], _selectedCategory,
+                        (value) {
+                      setState(() {
+                        _selectedCategory = value;
+                      });
+                    }),
+                const SizedBox(height: 16),
+                buildTitleAndField('Aadhar/Birth Certificate Number ',
+                    'Enter Aadhar/Birth certificate number',
+                    controller: _aadharController),
+                const SizedBox(height: 16),
+                GestureDetector(
+                  onTap: _pickProfilePhoto,
+                  child: Container(
+                    height: 150,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    child: Center(
+                      child: _profilePhotoData != null
+                          ? Image.memory(_profilePhotoData!)
+                          : Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.image, size: 40, color: Colors.grey),
+                          TextButton(
+                            onPressed: _pickProfilePhoto,
+                            child: const Text('Drop your image or browse'),
+                          ),
+                          const Text(
+                            'JPEG or PNGs only • 8MB max',
+                            style: TextStyle(fontSize: 12, color: Colors.grey),
+                          ),
+                          if(profileImageError)const Text(
+                            'please upload profile photo',
+                            style: TextStyle(fontSize: 10, color: Colors.red),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                'Upload Document',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
-              ),
-              const SizedBox(height: 8),
-              SizedBox(
-                height: 50,
-                child: ElevatedButton.icon(
-                  onPressed: _pickDocument,
-                  icon: const Icon(Icons.upload_file, color: Colors.white),
-                  label: const Text(
-                    'Upload Document',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.black,
-                    backgroundColor: Colors.blueAccent,
-                    side: const BorderSide(color: Colors.blueAccent),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(5.0),
-                    ),
-                    elevation: 0,
+                const SizedBox(height: 16),
+                const Text(
+                  'Upload Document',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
                   ),
                 ),
-              ),
-              if(docFileError)const Text(
-                'please upload aadhaar/birth certificate',
-                style: TextStyle(fontSize: 10, color: Colors.red),
-              ),
-              if (_documentName != null) ...[
                 const SizedBox(height: 8),
-                Text(
-                  _documentName!,
-                  style: const TextStyle(color: Colors.black87),
+                SizedBox(
+                  height: 50,
+                  child: ElevatedButton.icon(
+                    onPressed: _pickDocument,
+                    icon: const Icon(Icons.upload_file, color: Colors.white),
+                    label: const Text(
+                      'Upload Document',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.black,
+                      backgroundColor: Colors.blueAccent,
+                      side: const BorderSide(color: Colors.blueAccent),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5.0),
+                      ),
+                      elevation: 0,
+                    ),
+                  ),
+                ),
+                if(docFileError)const Text(
+                  'please upload aadhaar/birth certificate',
+                  style: TextStyle(fontSize: 10, color: Colors.red),
+                ),
+                if (_documentName != null) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    _documentName!,
+                    style: const TextStyle(color: Colors.black87),
+                  ),
+                ],
+                const SizedBox(height: 8),
+                const Text(
+                  'Only JPEG and PDFs are accepted.',
+                  style: TextStyle(color: Colors.grey),
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+            
+                      onPressed: () {
+            
+                        _handleSubmit();
+                      },
+                      child: const Row(
+                        children: [
+                          Text('Next', style: TextStyle(fontSize: 16, color: Colors.blueAccent)),
+                          Icon(Icons.arrow_forward_rounded, color: Colors.blueAccent),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ],
-              const SizedBox(height: 8),
-              const Text(
-                'Only JPEG and PDFs are accepted.',
-                style: TextStyle(color: Colors.grey),
-              ),
-              const SizedBox(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-
-                    onPressed: () {
-
-                      _handleSubmit();
-                    },
-                    child: const Row(
-                      children: [
-                        Text('Next', style: TextStyle(fontSize: 16, color: Colors.blueAccent)),
-                        Icon(Icons.arrow_forward_rounded, color: Colors.blueAccent),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ],
+            ),
           ),
         ),
       ),
